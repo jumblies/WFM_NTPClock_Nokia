@@ -63,8 +63,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 
-// Include Font
-//#include <Fonts/FreeSansBoldOblique9pt7b.h>
+
 
 //for LED status
 #include <Ticker.h>
@@ -129,8 +128,8 @@ void setup()
   //WiFiManager
   //Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wifiManager;
-  //reset settings - for testing
-  //    wifiManager.resetSettings();
+
+  //wifiManager.resetSettings();    
 
   //set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
   wifiManager.setAPCallback(configModeCallback);
@@ -179,7 +178,7 @@ void setup()
   Serial.println(F("waiting for sync"));
 
 
-  
+
   setSyncProvider(getNtpTime);
   setSyncInterval(5 * 60);
 
@@ -256,10 +255,10 @@ void digitalClockDisplay() {
   display.setTextSize(3);
   display.setCursor(0, 9);
   display.printf("%02d", tm.Hour);
-  display.drawBitmap(36, 14, SKINNY_COLON, 4, 14, 1);
+  display.drawBitmap(36, 13, SKINNY_COLON, 4, 14, 1); //prev 37, 14
   display.setCursor(42, 9);
   display.printf("%02d", tm.Minute);
-//  display.drawBitmap(54, 16, SKINNY_COLON, 4, 14, 1);
+  //  display.drawBitmap(54, 16, SKINNY_COLON, 4, 14, 1);
   display.setCursor(72, 32);
   display.setTextSize(1);
   display.printf("%02d", tm.Second);
