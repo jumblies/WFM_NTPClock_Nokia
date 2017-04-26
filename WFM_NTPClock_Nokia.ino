@@ -72,7 +72,8 @@ Ticker ticker;
     Lookup the IP address for the host name instead */
 static const char ntpServerName[] = "time.nist.gov";
 static const char tzName[] = "Eastern";
-static const int timeZone = -5;  // Eastern Standard Time (USA)
+static const int timeZone = -4;  // Eastern Standard Time (USA)
+// -4 for DST, -5 for non DST
 
 
 void tick()
@@ -116,6 +117,15 @@ void setup()
 {
   Serial.begin(115200);
 
+  // Initialize LCD
+  display.begin();
+  display.setContrast(55);
+  display.setTextSize(2);
+  display.setTextColor(BLACK);
+  display.clearDisplay();
+  display.print("Booting");
+  display.display();
+
   //set led pin as output
   pinMode(BUILTIN_LED, OUTPUT);
   // start ticker with 0.5 because we start in AP mode and try to connect
@@ -148,12 +158,14 @@ void setup()
   digitalWrite(BUILTIN_LED, HIGH);
 
   // Initialize LCD
-  display.begin();
-  display.setContrast(55);
-  display.setTextSize(2);
-  display.setTextColor(BLACK);
-  display.clearDisplay();
-  display.display();
+  //  display.begin();
+  //  display.setContrast(55);
+  //  display.setTextSize(2);
+  //  display.setTextColor(BLACK);
+  //  display.clearDisplay();
+  //  display.display();
+
+
 
 
   Serial.print(F("IP number assigned by DHCP is "));
@@ -183,7 +195,7 @@ void setup()
   // pinMode(15, OUTPUT);
   // digitalWrite(15, HIGH);
   // Backlight control on pin 15 at 25% (256/1024).
-  analogWrite(15, 256);
+  //  analogWrite(15, 256);
 }
 
 void loop()
@@ -255,6 +267,7 @@ void digitalClockDisplay() {
   display.printf("%02d", tm.Second);
 
   display.setCursor(0, 32);
+
   display.print(tzName);
   display.display();
 }
