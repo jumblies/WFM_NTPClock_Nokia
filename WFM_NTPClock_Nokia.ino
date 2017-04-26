@@ -63,6 +63,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 
+// Include Font
+//#include <Fonts/FreeSansBoldOblique9pt7b.h>
+
 //for LED status
 #include <Ticker.h>
 Ticker ticker;
@@ -117,14 +120,6 @@ void setup()
 {
   Serial.begin(115200);
 
-  // Initialize LCD
-  display.begin();
-  display.setContrast(55);
-  display.setTextSize(2);
-  display.setTextColor(BLACK);
-  display.clearDisplay();
-  display.print("Booting");
-  display.display();
 
   //set led pin as output
   pinMode(BUILTIN_LED, OUTPUT);
@@ -158,15 +153,12 @@ void setup()
   digitalWrite(BUILTIN_LED, HIGH);
 
   // Initialize LCD
-  //  display.begin();
-  //  display.setContrast(55);
-  //  display.setTextSize(2);
-  //  display.setTextColor(BLACK);
-  //  display.clearDisplay();
-  //  display.display();
-
-
-
+  display.begin();
+  display.setContrast(55);
+  display.setTextSize(2);
+  display.setTextColor(BLACK);
+  display.clearDisplay();
+  display.display();
 
   Serial.print(F("IP number assigned by DHCP is "));
   Serial.println(WiFi.localIP());
@@ -185,8 +177,12 @@ void setup()
   Serial.print(F("Local port: "));
   Serial.println(Udp.localPort());
   Serial.println(F("waiting for sync"));
+
+
+  
   setSyncProvider(getNtpTime);
   setSyncInterval(5 * 60);
+
 
   // If the analogWrite is moved up too early in setup(), it triggers
   // a crash. Works OK here.
@@ -216,6 +212,7 @@ void loop()
       break;
     case timeNotSet:
       Serial.println(F("Time not set"));
+      delay(1000);                      //Missing delay here to prevent flooding of serial comm
       now();
       break;
     default:
@@ -256,19 +253,27 @@ void digitalClockDisplay() {
   display.setTextWrap(false);
   display.printf("%s %02d %02d %04d\n",
                  dayOfWeek, tm.Month, tm.Day, tm.Year + 1970);
-  display.setTextSize(2);
-  display.setCursor(0, 16);
+  display.setTextSize(3);
+  display.setCursor(0, 9);
   display.printf("%02d", tm.Hour);
-  display.drawBitmap(24, 16, SKINNY_COLON, 4, 14, 1);
-  display.setCursor(30, 16);
+  display.drawBitmap(36, 14, SKINNY_COLON, 4, 14, 1);
+  display.setCursor(42, 9);
   display.printf("%02d", tm.Minute);
-  display.drawBitmap(54, 16, SKINNY_COLON, 4, 14, 1);
-  display.setCursor(60, 16);
+//  display.drawBitmap(54, 16, SKINNY_COLON, 4, 14, 1);
+  display.setCursor(72, 32);
+  display.setTextSize(1);
   display.printf("%02d", tm.Second);
 
-  display.setCursor(0, 32);
+  display.setCursor(0, 40);
+  display.setTextSize(1);
+  display.print("IP:");
+  display.println(WiFi.localIP());
+  display.drawRect(0, 32, 62, 7, BLACK);
+  display.fillRect(1, 32, (tm.Second), 7, BLACK);      // draw seconds graphic timer across bottom
 
-  display.print(tzName);
+
+
+  //  display.print(tzName);    //Didn't want the Timezone name to be displayed.
   display.display();
 }
 
