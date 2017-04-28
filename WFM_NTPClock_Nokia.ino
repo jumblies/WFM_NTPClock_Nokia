@@ -63,6 +63,9 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
 
+// OTA updates
+#include <ArduinoOTA.h>
+
 
 
 //for LED status
@@ -129,7 +132,7 @@ void setup()
   //Local intialization. Once its business is done, there is no need to keep it around
   WiFiManager wifiManager;
 
-  //wifiManager.resetSettings();    
+  //  wifiManager.resetSettings();
 
   //set callback that gets called when connecting to previous WiFi fails, and enters Access Point mode
   wifiManager.setAPCallback(configModeCallback);
@@ -182,16 +185,33 @@ void setup()
   setSyncProvider(getNtpTime);
   setSyncInterval(5 * 60);
 
+  //OTA section
+  ArduinoOTA.setHostname("ESPOTAClock");
 
-  // If the analogWrite is moved up too early in setup(), it triggers
-  // a crash. Works OK here.
-  // If crashing persists, turn the backlight on using digitalWrite
-  // like this.
-  // pinMode(15, OUTPUT);
-  // digitalWrite(15, HIGH);
-  // Backlight control on pin 15 at 25% (256/1024).
-  //  analogWrite(15, 256);
+  // No authentication by default
+  //   ArduinoOTA.setPassword((const char *)"ESP8266NET");
+
+  ArduinoOTA.onStart([]() {
+    Serial.println("Start");
+  });
+  ArduinoOTA.onEnd([]() {
+    Serial.println("\nEnd");
+  });
+  ArduinoOTA.onProgress([](unsigned int progress, unsigned int total) {
+    Serial.printf("Progress: %u%%\r", (progress / (total / 100)));
+  });
+  ArduinoOTA.onError([](ota_error_t error) {
+    Serial.printf("Error[%u]: ", error);
+    if (error == OTA_AUTH_ERROR) Serial.println("Auth Failed");
+    else if (error == OTA_BEGIN_ERROR) Serial.println("Begin Failed");
+    else if (error == OTA_CONNECT_ERROR) Serial.println("Connect Failed");
+    else if (error == OTA_RECEIVE_ERROR) Serial.println("Receive Failed");
+    else if (error == OTA_END_ERROR) Serial.println("End Failed");
+  });
+  ArduinoOTA.begin();
+
 }
+
 
 void loop()
 {
@@ -217,6 +237,7 @@ void loop()
     default:
       break;
   }
+  ArduinoOTA.handle();
 }
 
 const uint8_t SKINNY_COLON[] PROGMEM = {
